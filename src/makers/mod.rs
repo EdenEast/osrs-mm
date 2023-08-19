@@ -18,13 +18,14 @@ pub struct ReportEntry<'a> {
     pub limit: usize,
     pub profit: isize,
     pub volume: usize,
+    // pub rank: f32,
 }
 
 impl<'a> ReportEntry<'a> {
     pub fn new(name: &'a str, gross: usize, cost: usize, limit: usize, volume: usize) -> Self {
         let profit = gross as isize - cost as isize;
         // TODO: weight methods that dont have high volume lower even if the profit high
-        // let rank = (profit / limit as isize) * volume as isize;
+        // let rank = ((limit as f32 / volume as f32) * 1.0) * profit as f32; //  * 1.0;
 
         Self {
             profit,
@@ -33,6 +34,7 @@ impl<'a> ReportEntry<'a> {
             cost,
             limit,
             volume,
+            // rank,
         }
     }
 }
