@@ -1,9 +1,12 @@
 use std::vec;
 
+use serde::de::value::IsizeDeserializer;
+
 use crate::cache::Cache;
 
 mod bolts;
 mod clay;
+mod decanting;
 mod leather;
 mod planks;
 
@@ -16,16 +19,22 @@ pub struct ReportEntry<'a> {
     pub cost: usize,
     pub limit: usize,
     pub profit: isize,
+    pub volume: usize,
 }
 
 impl<'a> ReportEntry<'a> {
-    pub fn new(name: &'a str, gross: usize, cost: usize, limit: usize) -> Self {
+    pub fn new(name: &'a str, gross: usize, cost: usize, limit: usize, volume: usize) -> Self {
+        let profit = gross as isize - cost as isize;
+        // TODO: weight methods that dont have high volume lower even if the profit high
+        // let rank = (profit / limit as isize) * volume as isize;
+
         Self {
-            profit: gross as isize - cost as isize,
+            profit,
             name,
             gross,
             cost,
             limit,
+            volume,
         }
     }
 }
@@ -58,6 +67,7 @@ pub fn report(cache: &Cache) -> Report {
     vec![
         bolts::Bolts::run(cache),
         clay::Clay::run(cache),
+        decanting::Decanting::run(cache),
         leather::Leather::run(cache),
         planks::Plank::run(cache),
     ]

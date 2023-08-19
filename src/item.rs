@@ -33,12 +33,20 @@ pub struct ItemPriceResponse {
     pub data: HashMap<usize, ItemPrice>,
 }
 
+/// Response for the `/volumes` endpoint of the price API
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DailyVolumeResponse {
+    pub timestamp: usize,
+    pub data: HashMap<usize, usize>,
+}
+
 /// An item's core data paired with its current price data. Price data will be
 /// `None` if it hasn't been traded recently.
 #[derive(Clone, Debug)]
 pub struct ItemWithPrice<'a> {
     pub item: &'a Item,
     pub price: Option<&'a ItemPrice>,
+    pub volume: usize,
 }
 
 impl<'a> ItemWithPrice<'a> {

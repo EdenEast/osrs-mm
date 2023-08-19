@@ -28,6 +28,7 @@ impl Maker for Bolts {
                 gross,
                 cost,
                 limit,
+                diamond_dragon_bolt_e.volume,
             ));
         }
 
@@ -50,6 +51,7 @@ impl Maker for Bolts {
                 gross,
                 cost,
                 limit,
+                ruby_dragon_bolt_e.volume,
             ));
         }
         report

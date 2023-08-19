@@ -28,6 +28,7 @@ impl Maker for Leather {
                 gross,
                 cost,
                 limit,
+                leather.volume,
             ));
         };
 

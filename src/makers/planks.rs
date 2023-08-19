@@ -15,11 +15,10 @@ impl Maker for Plank {
         let rune_cast_cost = (astral.avg() * 2) + nature.avg();
         let limit = 3000;
 
-        {
-            let plank = cache.get(ID_MAHOGANY_PLANK);
-            let log = cache.get(ID_MAHOGANY_LOG);
-            let log_cast_price = 1050;
-            let single_cast_cost = rune_cast_cost + log.low() + log_cast_price;
+        let mut variant = |plank, log, cast_price| {
+            let plank = cache.get(plank);
+            let log = cache.get(log);
+            let single_cast_cost = rune_cast_cost + log.low() + cast_price;
             let cost = single_cast_cost * limit;
 
             let gross = plank.high() * limit;
@@ -28,24 +27,12 @@ impl Maker for Plank {
                 gross,
                 cost,
                 limit,
+                plank.volume,
             ));
-        }
+        };
 
-        {
-            let plank = cache.get(ID_TEAK_PLANK);
-            let log = cache.get(ID_TEAK_LOG);
-            let log_cast_price = 350;
-            let single_cast_cost = rune_cast_cost + log.low() + log_cast_price;
-            let cost = single_cast_cost * limit;
-
-            let gross = plank.high() * limit;
-            report.push(ReportEntry::new(
-                plank.item.name.as_str(),
-                gross,
-                cost,
-                limit,
-            ));
-        }
+        variant(ID_MAHOGANY_PLANK, ID_MAHOGANY_LOG, 1050);
+        variant(ID_TEAK_PLANK, ID_TEAK_LOG, 350);
 
         report
     }

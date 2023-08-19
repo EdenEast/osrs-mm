@@ -22,6 +22,7 @@ impl Maker for Clay {
             gross,
             cost,
             limit,
+            soft_clay.volume,
         ));
 
         report

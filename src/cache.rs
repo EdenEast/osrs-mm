@@ -3,17 +3,20 @@ use std::{collections::HashMap, path::Path};
 use eyre::Result;
 use serde::de::DeserializeOwned;
 
-use crate::item::{Item, ItemPrice, ItemPriceResponse, ItemWithPrice};
+use crate::item::{DailyVolumeResponse, Item, ItemPrice, ItemPriceResponse, ItemWithPrice};
 
 const ITEM_MAP_CACHE_FILEPATH: &str = "cache/item_map.json";
 const PRICES_CACHE_FILEPATH: &str = "cache/prices.json";
+const VOLUMES_CACHE_FILEPATH: &str = "cache/volumes.json";
 
 type ItemMap = HashMap<usize, Item>;
 type ItemPriceMap = HashMap<usize, ItemPrice>;
+type VolumeMap = HashMap<usize, usize>;
 
 pub struct Cache {
     pub items: ItemMap,
     pub prices: ItemPriceMap,
+    pub volumes: VolumeMap,
 }
 
 impl Cache {
@@ -21,6 +24,7 @@ impl Cache {
         Ok(Self {
             items: load_item_map()?,
             prices: load_price_map(force)?,
+            volumes: load_volume_map(force)?,
         })
     }
 
@@ -31,7 +35,12 @@ impl Cache {
             .expect("I hardcode all ids and know them in advance");
 
         let price = self.prices.get(&id);
-        ItemWithPrice { item, price }
+        let volume = self.volumes.get(&id).map(|f| *f).unwrap_or_default();
+        ItemWithPrice {
+            item,
+            price,
+            volume,
+        }
     }
 }
 
@@ -127,6 +136,50 @@ fn load_price_map(force: bool) -> Result<ItemPriceMap> {
                 let prices = prices_from_url()?;
                 write_prices_to_cache(&prices)?;
                 prices
+            }
+        })
+    }
+}
+
+fn volumes_from_url() -> Result<VolumeMap> {
+    let response: DailyVolumeResponse = get("https://prices.runescape.wiki/api/v1/osrs/volumes")?;
+    Ok(response.data)
+}
+
+fn volumes_from_cache() -> Option<VolumeMap> {
+    let path = Path::new(VOLUMES_CACHE_FILEPATH);
+    if !path.exists() {
+        return None;
+    }
+
+    let contents = std::fs::read_to_string(path).ok()?;
+    serde_json::from_str(&contents).ok()
+}
+
+fn write_volumes_to_cache(volumes: &VolumeMap) -> Result<()> {
+    let contents = serde_json::to_string_pretty(&volumes)?;
+    let path = Path::new(VOLUMES_CACHE_FILEPATH);
+    if let Some(parent) = path.parent() {
+        if !parent.exists() {
+            std::fs::create_dir_all(parent)?;
+        }
+    }
+    std::fs::write(path, contents)?;
+    Ok(())
+}
+
+fn load_volume_map(force: bool) -> Result<VolumeMap> {
+    if force {
+        let volumes = volumes_from_url()?;
+        write_volumes_to_cache(&volumes)?;
+        Ok(volumes)
+    } else {
+        Ok(match volumes_from_cache() {
+            Some(volumes) => volumes,
+            None => {
+                let volumes = volumes_from_url()?;
+                write_volumes_to_cache(&volumes)?;
+                volumes
             }
         })
     }

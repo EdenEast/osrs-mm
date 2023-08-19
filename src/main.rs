@@ -36,11 +36,12 @@ fn main() -> eyre::Result<()> {
     let pp = pretty_print_int;
     for r in report {
         println!(
-            "{:>30}: {:>12}, [g: {:>12}, c: {:>12}, l: {:>7}]",
+            "{:>30}: {:>12}, [g: {:>12}, c: {:>12}, v: {:>12}, l: {:>7}]",
             r.name,
             pp(r.profit),
             pp(r.gross as isize),
             pp(r.cost as isize),
+            pp(r.volume as isize),
             pp(r.limit as isize),
         );
     }
