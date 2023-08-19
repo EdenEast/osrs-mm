@@ -1,22 +1,15 @@
 use cache::Cache;
 use clap::{arg, Parser};
+use num_format::{Locale, ToFormattedString};
 
 mod cache;
 mod id;
 mod item;
 mod makers;
 
-fn pretty_print_int(i: isize) -> String {
-    let mut s = String::new();
-    let i_str = i.to_string();
-    let a = i_str.chars().rev().enumerate();
-    for (idx, val) in a {
-        if idx != 0 && idx % 3 == 0 {
-            s.insert(0, ',');
-        }
-        s.insert(0, val);
-    }
-    s
+pub fn fmt_int<T: ToFormattedString>(num: &T) -> String {
+    let locale = Locale::en;
+    num.to_formatted_string(&locale)
 }
 
 #[derive(Debug, Parser)]
@@ -33,16 +26,20 @@ fn main() -> eyre::Result<()> {
     report.sort();
     report.reverse();
 
-    let pp = pretty_print_int;
+    println!(
+        "{:>30} | {:>12} | {:>12} | {:>12} | {:>12} | {:>7}",
+        "name", "profit", "gross", "cost", "volume", "limit"
+    );
+
     for r in report {
         println!(
-            "{:>30}: {:>12}, [g: {:>12}, c: {:>12}, v: {:>12}, l: {:>7}]",
+            "{:>30} | {:>12} | {:>12} | {:>12} | {:>12} | {:>7}",
             r.name,
-            pp(r.profit),
-            pp(r.gross as isize),
-            pp(r.cost as isize),
-            pp(r.volume as isize),
-            pp(r.limit as isize),
+            fmt_int(&r.profit),
+            fmt_int(&r.gross),
+            fmt_int(&r.cost),
+            fmt_int(&r.volume),
+            fmt_int(&r.limit),
         );
     }
 

@@ -1,7 +1,5 @@
 use std::vec;
 
-use serde::de::value::IsizeDeserializer;
-
 use crate::cache::Cache;
 
 mod bolts;
