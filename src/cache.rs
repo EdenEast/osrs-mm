@@ -17,10 +17,10 @@ pub struct Cache {
 }
 
 impl Cache {
-    pub fn new() -> Result<Self> {
+    pub fn new(force: bool) -> Result<Self> {
         Ok(Self {
             items: load_item_map()?,
-            prices: load_price_map()?,
+            prices: load_price_map(force)?,
         })
     }
 
@@ -115,13 +115,19 @@ fn write_prices_to_cache(prices: &ItemPriceMap) -> Result<()> {
     Ok(())
 }
 
-fn load_price_map() -> Result<ItemPriceMap> {
-    Ok(match prices_from_cache() {
-        Some(prices) => prices,
-        None => {
-            let prices = prices_from_url()?;
-            write_prices_to_cache(&prices)?;
-            prices
-        }
-    })
+fn load_price_map(force: bool) -> Result<ItemPriceMap> {
+    if force {
+        let prices = prices_from_url()?;
+        write_prices_to_cache(&prices)?;
+        Ok(prices)
+    } else {
+        Ok(match prices_from_cache() {
+            Some(prices) => prices,
+            None => {
+                let prices = prices_from_url()?;
+                write_prices_to_cache(&prices)?;
+                prices
+            }
+        })
+    }
 }

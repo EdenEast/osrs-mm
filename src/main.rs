@@ -1,4 +1,5 @@
 use cache::Cache;
+use clap::{arg, Parser};
 
 mod cache;
 mod id;
@@ -18,8 +19,16 @@ fn pretty_print_int(i: isize) -> String {
     s
 }
 
+#[derive(Debug, Parser)]
+struct Cli {
+    /// query latest prices regardless of cache
+    #[arg(short, long, default_value_t = false)]
+    force: bool,
+}
+
 fn main() -> eyre::Result<()> {
-    let cache = Cache::new()?;
+    let cli = Cli::parse();
+    let cache = Cache::new(cli.force)?;
     let mut report = makers::report(&cache);
     report.sort();
     report.reverse();
