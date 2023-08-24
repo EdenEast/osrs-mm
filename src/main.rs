@@ -32,6 +32,10 @@ fn main() -> eyre::Result<()> {
     );
 
     for r in report {
+        if r.profit.is_negative() || r.profit < 1_000_000 {
+            continue;
+        }
+
         println!(
             "{:>30} | {:>12} | {:>12} | {:>12} | {:>12} | {:>7}",
             r.name,

@@ -25,13 +25,12 @@ impl Maker for Decanting {
     fn run(cache: &crate::cache::Cache) -> super::Report {
         let mut report = Vec::new();
 
-        let limit = 1000;
-        let decant_total = (limit * 3) / 4;
-
         for (id_3, id_4) in POTION_IDS {
             let item_3 = cache.get(*id_3);
             let item_4 = cache.get(*id_4);
 
+            let limit = item_3.item.limit.unwrap();
+            let decant_total = (limit * 3) / 4;
             let cost = item_3.low() * limit;
             let gross = item_4.high() * decant_total;
 

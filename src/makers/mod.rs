@@ -5,14 +5,15 @@ use crate::cache::Cache;
 mod bolts;
 mod clay;
 mod decanting;
+mod herbs;
 mod leather;
 mod planks;
 
-pub type Report<'a> = Vec<ReportEntry<'a>>;
+pub type Report = Vec<ReportEntry>;
 
 #[derive(Debug)]
-pub struct ReportEntry<'a> {
-    pub name: &'a str,
+pub struct ReportEntry {
+    pub name: String,
     pub gross: usize,
     pub cost: usize,
     pub limit: usize,
@@ -21,15 +22,15 @@ pub struct ReportEntry<'a> {
     // pub rank: f32,
 }
 
-impl<'a> ReportEntry<'a> {
-    pub fn new(name: &'a str, gross: usize, cost: usize, limit: usize, volume: usize) -> Self {
+impl ReportEntry {
+    pub fn new(name: &str, gross: usize, cost: usize, limit: usize, volume: usize) -> Self {
         let profit = gross as isize - cost as isize;
         // TODO: weight methods that dont have high volume lower even if the profit high
         // let rank = ((limit as f32 / volume as f32) * 1.0) * profit as f32; //  * 1.0;
 
         Self {
             profit,
-            name,
+            name: name.to_string(),
             gross,
             cost,
             limit,
@@ -39,21 +40,21 @@ impl<'a> ReportEntry<'a> {
     }
 }
 
-impl<'a> Ord for ReportEntry<'a> {
+impl Ord for ReportEntry {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.profit.cmp(&other.profit)
     }
 }
 
-impl<'a> Eq for ReportEntry<'a> {}
+impl Eq for ReportEntry {}
 
-impl<'a> PartialOrd for ReportEntry<'a> {
+impl PartialOrd for ReportEntry {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.profit.partial_cmp(&other.profit)
     }
 }
 
-impl<'a> PartialEq for ReportEntry<'a> {
+impl PartialEq for ReportEntry {
     fn eq(&self, other: &Self) -> bool {
         self.profit.eq(&other.profit)
     }
@@ -68,6 +69,7 @@ pub fn report(cache: &Cache) -> Report {
         bolts::Bolts::run(cache),
         clay::Clay::run(cache),
         decanting::Decanting::run(cache),
+        herbs::Herbs::run(cache),
         leather::Leather::run(cache),
         planks::Plank::run(cache),
     ]
