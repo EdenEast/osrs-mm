@@ -12,29 +12,43 @@ impl Maker for Bolts {
         let blood = cache.get(ID_BLOOD_RUNE);
         let soul = cache.get(ID_SOUL_RUNE);
 
-        let mut variant = |unf, tips, ench_bolt, ench_rune| {
+        let mut variant = |unf, tips, bolts, ench_bolt, ench_rune| {
             let unf = cache.get(unf);
             let tip = cache.get(tips);
+            let bolts = cache.get(bolts);
             let ench_bolt = cache.get(ench_bolt);
             let limit = tip.item.limit.unwrap();
             let cast_cost = ench_rune * (limit / 10);
             let mat_cost = (unf.low() + tip.high()) * limit;
             let cost = cast_cost + mat_cost;
 
-            let gross = ench_bolt.high() * limit;
-            report.push(ReportEntry::new(
-                ench_bolt.item.name.as_str(),
-                gross,
-                cost,
-                limit,
-                ench_bolt.volume,
-            ));
+            {
+                let gross = bolts.high() * limit;
+                report.push(ReportEntry::new(
+                    bolts.item.name.as_str(),
+                    gross,
+                    mat_cost,
+                    limit,
+                    bolts.volume,
+                ));
+            }
+            {
+                let gross = ench_bolt.high() * limit;
+                report.push(ReportEntry::new(
+                    ench_bolt.item.name.as_str(),
+                    gross,
+                    cost,
+                    limit,
+                    ench_bolt.volume,
+                ));
+            }
         };
 
         // Diamond dragon bolt (e) Enchant cast is 2 law, 1 cosmic and 5 earth (use staff)
         variant(
             ID_DRAGON_BOLT_UNF,
             ID_DIAMOND_BOLT_TIPS,
+            ID_DIAMOND_DRAGON_BOLT,
             ID_DIAMOND_DRAGON_BOLT_E,
             (law.avg() * 2) + cosmic.avg(),
         );
@@ -43,6 +57,7 @@ impl Maker for Bolts {
         variant(
             ID_DRAGON_BOLT_UNF,
             ID_RUBY_BOLT_TIPS,
+            ID_RUBY_DRAGON_BOLT,
             ID_RUBY_DRAGON_BOLT_E,
             blood.avg() + cosmic.avg(),
         );
@@ -51,7 +66,8 @@ impl Maker for Bolts {
         variant(
             ID_DRAGON_BOLT_UNF,
             ID_DRAGONSTONE_BOLT_TIPS,
-            ID_DRAGONSTONE_DRANGON_BOLT_E,
+            ID_DRAGONSTONE_DRAGON_BOLT,
+            ID_DRAGONSTONE_DRAGON_BOLT_E,
             soul.avg() + cosmic.avg(),
         );
 
@@ -59,6 +75,7 @@ impl Maker for Bolts {
         variant(
             ID_DRAGON_BOLT_UNF,
             ID_OPAL_BOLT_TIPS,
+            ID_OPAL_DRAGON_BOLT,
             ID_OPAL_DRAGON_BOLT_E,
             cosmic.avg(),
         );
