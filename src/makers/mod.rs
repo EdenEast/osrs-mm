@@ -4,6 +4,7 @@ use crate::cache::Cache;
 
 mod bolts;
 mod clay;
+mod cooking;
 mod decanting;
 mod herbs;
 mod leather;
@@ -68,6 +69,7 @@ pub fn report(cache: &Cache) -> Report {
     vec![
         bolts::Bolts::run(cache),
         clay::Clay::run(cache),
+        cooking::Cooking::run(cache),
         decanting::Decanting::run(cache),
         herbs::Herbs::run(cache),
         leather::Leather::run(cache),
